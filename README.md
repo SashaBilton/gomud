@@ -1,2 +1,3 @@
 # gomud
-Golnag based Multi User Dungeon
+Golang based Multi User Dungeon
+<br>Journey onwards
