@@ -1,3 +1,3 @@
-module github.com/SashaBilton/gomud
+module gomud
 
 go 1.17
