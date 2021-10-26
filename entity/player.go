@@ -10,5 +10,5 @@ type Player struct {
 }
 
 func (player *Player) MoveToNamedExit(name string) {
-	player.Location = player.Location.Exits.Location
+	player.Location = player.Location.Exits[name].Location
 }
