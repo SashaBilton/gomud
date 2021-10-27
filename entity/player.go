@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"errors"
 	"gomud/space"
 )
 
@@ -9,6 +10,13 @@ type Player struct {
 	Location *space.Location
 }
 
-func (player *Player) MoveToNamedExit(name string) {
-	player.Location = player.Location.Exits[name].Location
+func (player *Player) MoveToNamedExit(name string) error {
+
+	exit := player.Location.Exits[name]
+	if exit == nil {
+		return errors.New("not found")
+	} else {
+		player.Location = exit.Location
+		return nil
+	}
 }

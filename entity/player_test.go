@@ -32,3 +32,29 @@ func TestMoveToNamedExit(t *testing.T) {
 	}
 
 }
+
+//Test to force safe error handling of attemp to move a non-existing location
+func TestNonExistingMoveToFNamdeExit(t *testing.T) {
+
+	startDesc := "This is where you start"
+
+	start := space.Location{Desc: startDesc}
+
+	endDesc := "This is where you end"
+	end := space.Location{Desc: endDesc}
+	exit := space.Exit{Name: "end", Desc: "an exit that lends to the end", Location: &end}
+
+	homeDesc := "Here is home"
+	home := space.Location{Desc: homeDesc}
+	homeExit := space.Exit{Name: "home", Desc: "a glowing tunnel leads home", Location: &home}
+
+	start.AddExit(&exit)
+	start.AddExit(&homeExit)
+
+	player := Player{Name: "Tester", Location: &start}
+
+	err := player.MoveToNamedExit("nowhere")
+	if err == nil {
+		t.Errorf("Expected err when moving to nowhere but nil")
+	}
+}
