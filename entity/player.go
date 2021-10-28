@@ -20,3 +20,12 @@ func (player *Player) MoveToNamedExit(name string) error {
 		return nil
 	}
 }
+
+func (player *Player) Look() string {
+	result := player.Location.Desc + "\n"
+
+	for _, exit := range player.Location.Exits {
+		result += exit.Desc + "\n"
+	}
+	return result
+}
