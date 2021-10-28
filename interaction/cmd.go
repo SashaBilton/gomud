@@ -16,7 +16,7 @@ func Tokenise(command string) []string {
 
 }
 
-func do(cmdTokens []string, player *entity.Player) string {
+func Do(cmdTokens []string, player *entity.Player) string {
 
 	result := "unknown command"
 	if cmdTokens[0] == "look" {
