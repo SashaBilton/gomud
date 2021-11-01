@@ -16,12 +16,12 @@ func Tokenise(command string) []string {
 
 }
 
-func Do(cmdTokens []string, player *entity.Player) string {
+func Do(cmdTokens []string, player *entity.Player, playerLocations *entity.PlayerMap) string {
 
 	result := "unknown command"
 	if cmdTokens[0] == "look" {
 
-		result = player.Look()
+		result = player.Look(playerLocations)
 
 	}
 	if cmdTokens[0] == "go" {
@@ -29,7 +29,9 @@ func Do(cmdTokens []string, player *entity.Player) string {
 		if err != nil {
 			result = err.Error()
 		} else {
-			result = player.Look()
+			playerLocations.MovePlayer(player.Location, player)
+
+			result = player.Look(playerLocations)
 		}
 	}
 	return result
