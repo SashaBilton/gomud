@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gomud/entity"
 	"gomud/interaction"
+	"gomud/server"
 	"gomud/space"
 	"math/rand"
 	"net"
@@ -30,7 +31,8 @@ func main() {
 	start := setupSimpleWorld()
 	playerLocations := new(entity.PlayerMap)
 	playerLocations.PL = make([]entity.PlayerLocation, 0, 100)
-	fmt.Println(&playerLocations)
+
+	playerconn := make([]server.PlayerConn, 0, 100)
 
 	for {
 		// Listen for an incoming connection.
@@ -39,23 +41,22 @@ func main() {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
+		name := "Wanderer " + strconv.Itoa(rand.Intn(999))
+		fmt.Println(name + " joined.")
+		player := entity.Player{Name: name, Location: &start}
+		playerLocations.MovePlayer(&start, &player)
 
+		playerconn = append(playerconn, server.PlayerConn{Conn: conn, Player: &player})
 		// Handle connections in a new goroutine.
-		fmt.Printf("%T\n", playerLocations)
-		go handleRequest(conn, &start, playerLocations)
+		go handleRequest(conn, &player, &start, playerLocations)
+		go notifyAll(playerconn, player.Name+" has joined")
 	}
 }
 
 // Handles incoming requests.
-func handleRequest(conn net.Conn, start *space.Location, playerLocations *entity.PlayerMap) {
+func handleRequest(conn net.Conn, player *entity.Player, start *space.Location, playerLocations *entity.PlayerMap) {
 
 	running := true
-
-	name := "Wanderer " + strconv.Itoa(rand.Intn(999))
-	fmt.Println(name + " joined.")
-	fmt.Println(&playerLocations)
-	player := entity.Player{Name: name, Location: start}
-	playerLocations.MovePlayer(start, &player)
 
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
@@ -68,7 +69,7 @@ func handleRequest(conn net.Conn, start *space.Location, playerLocations *entity
 		}
 		command := string(buf[:])
 		cmdTokens := interaction.Tokenise(command)
-		result := interaction.Do(cmdTokens, &player, playerLocations)
+		result := interaction.Do(cmdTokens, player, playerLocations)
 		conn.Write([]byte(result))
 		if cmdTokens[0] == "quit" {
 			running = false
@@ -87,6 +88,15 @@ func handleRequest(conn net.Conn, start *space.Location, playerLocations *entity
 	}
 
 	conn.Close()
+}
+
+func notifyAll(playerconn []server.PlayerConn, msg string) {
+
+	for _, pc := range playerconn {
+		pc.Conn.Write([]byte(" [" + msg + "] "))
+
+	}
+
 }
 
 func setupSimpleWorld() space.Location {
