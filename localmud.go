@@ -43,9 +43,9 @@ func setupSimpleWorld() entity.Player {
 	homeExit := space.Exit{Name: "home", Desc: "A glowing tunnel that leads home.", Location: &home}
 	startExit := space.Exit{Name: "start", Desc: "A glowing tunnel that leads to the start.", Location: &start}
 
-	start.AddExit(&exit)
-	start.AddExit(&homeExit)
-	home.AddExit(&startExit)
+	start.AddExit(exit)
+	start.AddExit(homeExit)
+	home.AddExit(startExit)
 
 	player := entity.Player{Name: "Tester", Location: &start}
 	return player

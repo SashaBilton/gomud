@@ -24,12 +24,17 @@ func TestLookCommand(t *testing.T) {
 	command := "LOOK"
 	commandTokens := Tokenise(command)
 	player := setupSimpleWorld()
-	result := do(commandTokens, &player)
+	playerLocations := new(entity.PlayerMap)
+	playerLocations.PL = make([]entity.PlayerLocation, 0, 100)
+	pl := entity.PlayerLocation{&player, player.Location}
+	playerLocations.PL = append(playerLocations.PL, pl)
+
+	result := Do(commandTokens, &player, playerLocations)
 
 	expected := fmt.Sprintf("This is where you start\nan exit that lends to the end\na glowing tunnel leads home\n")
 
 	if result != expected {
-		t.Errorf("Expected \n%s but was %s", expected, result)
+		t.Errorf("Expected \n%s\nbut was\n%s", expected, result)
 	}
 
 }
@@ -37,10 +42,15 @@ func TestLookCommand(t *testing.T) {
 //The go command should move the player to the location pointed to by the named exit
 func TestGoCommand(t *testing.T) {
 
-	command := "gO end"
+	command := "gO eXIT"
 	commandTokens := Tokenise(command)
 	player := setupSimpleWorld()
-	result := do(commandTokens, &player)
+	playerLocations := new(entity.PlayerMap)
+	playerLocations.PL = make([]entity.PlayerLocation, 0, 100)
+	pl := entity.PlayerLocation{&player, player.Location}
+	playerLocations.PL = append(playerLocations.PL, pl)
+
+	result := Do(commandTokens, &player, playerLocations)
 
 	expected := fmt.Sprintf("This is where you end\n")
 
@@ -57,14 +67,14 @@ func setupSimpleWorld() entity.Player {
 
 	endDesc := "This is where you end"
 	end := space.Location{Desc: endDesc}
-	exit := space.Exit{Name: "end", Desc: "an exit that lends to the end", Location: &end}
+	exit := space.Exit{Name: "exit", Desc: "an exit that lends to the end", Location: &end}
 
 	homeDesc := "Here is home"
 	home := space.Location{Desc: homeDesc}
 	homeExit := space.Exit{Name: "home", Desc: "a glowing tunnel leads home", Location: &home}
 
-	start.AddExit(&exit)
-	start.AddExit(&homeExit)
+	start.AddExit(exit)
+	start.AddExit(homeExit)
 
 	player := entity.Player{Name: "Tester", Location: &start}
 	return player
